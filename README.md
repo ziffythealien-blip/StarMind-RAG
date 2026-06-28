@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="assets/cover_starmind.png" width="100%">
+    <img src="assets/screenshots/Cover_starmind.png" width="100%">
 </p>
 
 <h1 align="center">🚀 StarMind RAG</h1>
@@ -51,7 +51,7 @@ Click below to watch StarMind in action.
 
 <p align="center">
 
-<a href="assets/demo.mp4">
+<a href="assets/demo.gif">
 
 <img src="assets/cover_starmind.png" width="850">
 
