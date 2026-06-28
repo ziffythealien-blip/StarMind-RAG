@@ -1,77 +1,119 @@
-# 🚀 StarMind RAG
+<p align="center">
+    <img src="assets/cover_starmind.png" width="100%">
+</p>
 
-> **A modern, privacy-first Retrieval-Augmented Generation (RAG) platform for intelligent document analysis and conversational AI.**
+<h1 align="center">🚀 StarMind RAG</h1>
 
-StarMind RAG is a local-first knowledge engine that transforms your documents into a searchable semantic database. It combines vector search, AI-powered reasoning, and an intuitive cyberpunk-inspired interface to provide fast, accurate, and explainable answers from your own knowledge base.
+<p align="center">
+<b>Retrieval-Augmented Generation Platform</b><br>
+Semantic Search • Local Knowledge Base • Conversational AI
+</p>
 
-Unlike traditional keyword search, StarMind understands the semantic meaning of your documents and retrieves the most relevant information before generating a response.
+<p align="center">
+
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![ChromaDB](https://img.shields.io/badge/ChromaDB-5E35B1?style=for-the-badge)
+![RAG](https://img.shields.io/badge/RAG-Semantic%20Search-blueviolet?style=for-the-badge)
+![MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+
+</p>
+
+---
+
+# 🌌 About
+
+**StarMind RAG** is a modern Retrieval-Augmented Generation platform designed to transform collections of documents into an intelligent semantic knowledge base.
+
+Instead of relying on keyword matching, StarMind retrieves the most relevant document fragments using vector similarity before generating accurate, context-aware responses with an AI language model.
+
+Everything is designed around a **local-first** philosophy, giving you complete control over your data.
 
 ---
 
 # ✨ Features
 
-- 🔒 **Privacy First**
-  - All documents remain on your machine.
-  - No cloud storage required.
-  - Local vector database.
+- 🧠 Semantic document retrieval
+- 📚 Vector database powered by ChromaDB
+- 💬 AI conversational assistant
+- 📄 PDF knowledge indexing
+- 🔍 Context-aware semantic search
+- ⚡ FastAPI backend
+- 🎨 Cyberpunk Glassmorphism Interface
+- 🌐 Optional Hybrid Web Search
+- 🔒 Privacy-first architecture
 
-- 🧠 **Semantic Search**
-  - Embedding-based document retrieval.
-  - Context-aware responses.
-  - Intelligent chunk ranking.
+---
 
-- 📄 **Multi-Document Support**
-  - PDF
-  - DOCX
-  - TXT
-  - Markdown
+# 🎥 Live Demo
 
-- ⚡ **Hybrid Retrieval**
-  - Local knowledge base
-  - Optional web search
-  - Combined contextual responses
+Click below to watch StarMind in action.
 
-- 💬 **Conversational AI**
-  - Context-aware chat
-  - Conversation history
-  - Markdown responses
+<p align="center">
 
-- 🎨 **Modern Dashboard**
-  - Glassmorphism UI
-  - Animated Quantum Core
-  - Interactive knowledge cards
-  - Responsive layout
+<a href="assets/demo.mp4">
+
+<img src="assets/cover_starmind.png" width="850">
+
+</a>
+
+</p>
+
+---
+
+# 📸 Screenshots
+
+## Dashboard
+
+<p align="center">
+<img src="assets/screenshots/dashboard.png" width="900">
+</p>
+
+---
+
+## Semantic Search
+
+<p align="center">
+<img src="assets/screenshots/search.png" width="900">
+</p>
+
+---
+
+## Conversational Assistant
+
+<p align="center">
+<img src="assets/screenshots/chat.png" width="900">
+</p>
 
 ---
 
 # 🏗 Architecture
 
 ```text
-                     User
-                       │
-                       ▼
-                 FastAPI Backend
-                       │
-        ┌──────────────┼──────────────┐
-        ▼                             ▼
-   Vector Database              Optional Web Search
-      (ChromaDB)                 (DuckDuckGo)
-        │                             │
-        └──────────────┬──────────────┘
-                       ▼
-                 Context Builder
-                       │
-                       ▼
-                 Language Model
-             (Groq / Ollama / OpenAI)
-                       │
-                       ▼
-                  Final Response
+                        User
+                          │
+                          ▼
+                  FastAPI Backend
+                          │
+          ┌───────────────┼────────────────┐
+          ▼                                ▼
+     ChromaDB                       Optional Web Search
+          │                                │
+          └───────────────┬────────────────┘
+                          ▼
+                  Context Builder
+                          │
+                          ▼
+                 Large Language Model
+                   (Groq / Ollama)
+                          │
+                          ▼
+                   AI Generated Answer
 ```
 
 ---
 
-# 🧠 How Retrieval Works
+# 🧠 Retrieval Pipeline
 
 ```text
 Documents
@@ -86,7 +128,7 @@ Embeddings
 
 ↓
 
-ChromaDB
+Vector Database
 
 ↓
 
@@ -94,11 +136,7 @@ User Question
 
 ↓
 
-Question Embedding
-
-↓
-
-Similarity Search
+Semantic Retrieval
 
 ↓
 
@@ -106,11 +144,11 @@ Top Relevant Chunks
 
 ↓
 
-LLM
+Language Model
 
 ↓
 
-AI Response
+Answer + Sources
 ```
 
 ---
@@ -119,23 +157,22 @@ AI Response
 
 ### Backend
 
-- Python 3.10+
+- Python
 - FastAPI
 - Uvicorn
 
 ### AI
 
-- SentenceTransformers
 - ChromaDB
-- Groq API *(default)*
-- Ollama *(optional)*
-- OpenAI *(optional)*
+- SentenceTransformers
+- Groq API
+- Ollama (optional)
 
 ### Frontend
 
 - HTML5
 - CSS3
-- JavaScript (ES6)
+- JavaScript
 - Marked.js
 
 ---
@@ -145,24 +182,21 @@ AI Response
 ```text
 StarMind-RAG/
 
-├── app/
-│   ├── main.py
-│   ├── api/
-│   ├── rag/
-│   └── llm/
+├── assets/
+│   ├── cover_starmind.png
+│   ├── demo.mp4
+│   └── screenshots/
+│       ├── dashboard.png
+│       ├── search.png
+│       └── chat.png
 │
-├── data/
-│   ├── documents/
-│   └── chroma/
+├── documentos/
+│   ├── *.pdf
 │
-├── frontend/
-│   ├── index.html
-│   ├── css/
-│   └── js/
+├── chroma_db/
 │
-├── scripts/
-│   └── index_documents.py
-│
+├── app.py
+├── index.html
 ├── requirements.txt
 └── README.md
 ```
@@ -174,7 +208,7 @@ StarMind-RAG/
 Clone the repository.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/StarMind-RAG.git
+git clone https://github.com/ziffythealien-blip/StarMind-RAG.git
 
 cd StarMind-RAG
 ```
@@ -189,164 +223,101 @@ pip install -r requirements.txt
 
 # 📚 Build Your Knowledge Base
 
-Place your documents inside:
+Place your PDF documents inside:
 
 ```text
-data/documents/
+documentos/
 ```
 
-Supported formats:
-
-- PDF
-- DOCX
-- TXT
-- Markdown
-
-Then index them.
+Then start the application.
 
 ```bash
-python scripts/index_documents.py
+python app.py
 ```
 
-This process:
-
-- extracts text
-- splits documents into chunks
-- generates embeddings
-- stores vectors in ChromaDB
+StarMind will automatically index your documents into ChromaDB and make them available for semantic retrieval.
 
 ---
 
-# ▶ Running
-
-Start the API.
-
-```bash
-python app/main.py
-```
-
-or
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Open:
-
-```
-http://127.0.0.1:8000
-```
-
----
-
-# 🌐 API
+# 🌐 API Endpoints
 
 ## System Status
 
-```
+```http
 GET /api/system-status
 ```
 
-Returns:
-
-- system information
-- status
-- dashboard tips
+Returns dashboard information and live status.
 
 ---
 
 ## Semantic Search
 
-```
+```http
 POST /api/search
 ```
 
-Performs:
-
-- embedding generation
-- vector similarity search
-- context retrieval
-- AI response generation
+Retrieves relevant document chunks and generates an AI-powered response.
 
 ---
 
 ## Chat
 
-```
+```http
 POST /api/chat
 ```
 
-Maintains short-term conversation history while leveraging the document knowledge base.
+Maintains contextual conversations with the AI assistant.
 
 ---
 
-# 🔍 Retrieval Pipeline
+# 🔒 Privacy
 
-```text
-User Question
+StarMind follows a **local-first architecture**.
 
-↓
-
-Embedding Model
-
-↓
-
-Vector Search
-
-↓
-
-Top-K Chunks
-
-↓
-
-Prompt Builder
-
-↓
-
-Language Model
-
-↓
-
-Answer + Sources
-```
-
----
-
-# 🔐 Privacy
-
-StarMind is designed with a local-first philosophy.
-
-Your documents remain under your control.
-
-The vector database is stored locally.
-
-No document content is uploaded to external services unless you explicitly configure an online language model.
+- Documents stay on your machine.
+- Local vector database.
+- No cloud storage required.
+- Optional online language models.
 
 ---
 
 # 📈 Roadmap
 
-- [ ] PDF support
-- [ ] DOCX support
-- [ ] Markdown support
-- [ ] Image OCR
-- [ ] Audio transcription
-- [ ] Video transcript indexing
-- [ ] Hybrid Retrieval
-- [ ] Multi-user workspaces
-- [ ] Plugin system
-- [ ] Knowledge Graph
-- [ ] Agentic Retrieval
-- [ ] Streaming responses
+- ✅ PDF Retrieval
+- ✅ Conversational AI
+- ✅ ChromaDB
+- 🔄 DOCX Support
+- 🔄 Markdown Support
+- 🔄 OCR Images
+- 🔄 Audio Transcription
+- 🔄 Video Indexing
+- 🔄 Hybrid Retrieval
+- 🔄 Knowledge Graph
+- 🔄 Streaming Responses
 
 ---
 
-# 📜 License
+# 🤝 Contributing
 
-MIT License
+Contributions, ideas, feature requests, and pull requests are always welcome.
 
 ---
 
-# ⭐ StarMind
+# 📄 License
 
-**Think beyond search. Retrieve knowledge. Generate intelligence.**
+This project is licensed under the **MIT License**.
+
+---
+
+<p align="center">
+
+## ⭐ StarMind
+
+### *Think Beyond Search.*
+
+### *Retrieve Knowledge.*
+
+### *Generate Intelligence.*
+
+</p>
