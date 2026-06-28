@@ -10,7 +10,7 @@ venv/
 chroma_db/
 
 # Documents
-documentos/
+#documentos/
 
 # IDE
 .vscode/
