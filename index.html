@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarMind RAG</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght=700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Declaración de la fuente personalizada local */
+        @font-face {
+            font-family: 'Nirequa';
+            src: url('Nirequa.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --bg-deep: #080911;
+            --glass-bg: rgba(18, 20, 32, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f4f4f5;
+            --text-muted: #9ca3af;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --apple-ease: cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { 
+            background-color: var(--bg-deep); 
+            background-image: radial-gradient(circle at 10% 20%, rgba(45, 35, 90, 0.3) 0%, rgba(8, 9, 17, 1) 70%); 
+            color: var(--text-main); height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; overflow: hidden; 
+        }
+        
+        .dashboard-container { 
+            width: 100%; max-width: 1500px; height: 94vh; 
+            background: var(--glass-bg); backdrop-filter: blur(30px); border: 1px solid var(--glass-border); 
+            border-radius: 24px; display: flex; gap: 24px; padding: 24px; 
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6); 
+        }
+        
+        .main-col { flex: 1; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; padding-right: 10px; transition: width 0.4s var(--apple-ease); min-width: 0; }
+        .main-col::-webkit-scrollbar, .chat-messages::-webkit-scrollbar, .sources-list::-webkit-scrollbar { width: 6px; }
+        .main-col::-webkit-scrollbar-thumb, .chat-messages::-webkit-scrollbar-thumb, .sources-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        
+        /* BARRA SUPERIOR UPGRADED CON LÁSER */
+        .top-status { 
+            position: relative;
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 16px; 
+            padding: 12px 20px; 
+            overflow: hidden;
+        }
+        /* Línea Láser de Sincronización de Red Ciberpunk */
+        .top-status::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -100%;
+            width: 50%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-purple), var(--accent-blue), transparent);
+            animation: laser-scan 4s linear infinite;
+        }
+        @keyframes laser-scan {
+            0% { left: -100%; }
+            100% { left: 150%; }
+        }
+
+        .status-left { display: flex; align-items: center; gap: 16px; }
+        
+        /* NUEVO NÚCLEO CUÁNTICO DE IA (REEMPLAZA ORB-CONTAINER ANTERIOR) */
+        .quantum-core-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+        .quantum-core {
+            width: 8px;
+            height: 8px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            z-index: 3;
+            box-shadow: 0 0 12px #fff, 0 0 20px var(--accent-purple);
+            transition: all 0.3s ease;
+        }
+        /* Primera Onda de Pulso Cuántico */
+        .quantum-core-container::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(139, 92, 246, 0.25);
+            animation: pulse-wave 2s infinite ease-in-out;
+            z-index: 1;
+        }
+        /* Segundo Anillo: Órbita de Datos Discontinua */
+        .quantum-core-container::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px dashed rgba(139, 92, 246, 0.45);
+            animation: orbit-spin 10s linear infinite;
+            z-index: 2;
+        }
+        @keyframes pulse-wave {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+        @keyframes orbit-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Estados dinámicos para el núcleo al buscar */
+        .quantum-core-container.processing .quantum-core {
+            background-color: #ff9f1c;
+            box-shadow: 0 0 12px #ff9f1c, 0 0 20px #e85d04;
+        }
+        .quantum-core-container.processing::before {
+            background: rgba(232, 93, 4, 0.4);
+            animation-duration: 0.8s; /* Pulso acelerado */
+        }
+
+        .status-text { font-size: 0.8rem; line-height: 1.4; color: var(--text-main); }
+        
+        /* Estilos para la transición fluida del carrusel de tips */
+        .tip-text {
+            font-size: 0.85rem; 
+            color: #60a5fa; 
+            font-style: italic; 
+            margin-right: 10px;
+            transition: opacity 0.4s var(--apple-ease), transform 0.4s var(--apple-ease);
+            display: inline-block;
+            opacity: 1;
+        }
+        .tip-text.fade-out {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .icon-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-main); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        .icon-btn:hover { background: rgba(139, 92, 246, 0.2); border-color: var(--accent-purple); }
+
+        .logo-wrapper { position: relative; width: 100%; height: 220px; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .logo-wrapper::before { content: ''; position: absolute; width: 150%; height: 300%; background: conic-gradient(transparent, transparent, transparent, #e85d04, #2a9d8f, #4facfe); animation: spin 5s linear infinite; }
+        .logo-wrapper.is-searching::before { animation: spin 0.6s linear infinite; }
+        .logo-wrapper::after { content: ''; position: absolute; inset: 2px; background-color: rgba(18, 20, 32, 0.95); border-radius: 14px; backdrop-filter: blur(10px); }
+        
+        .logo-content { position: relative; z-index: 10; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%; justify-content: center; padding: 10px; }
+        .logo-content img { max-width: 100%; max-height: 170px; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); }
+        .logo-content p { margin: 5px 0 0 0; color: var(--text-muted); font-size: 0.95rem; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .search-bar { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 18px 24px; display: flex; align-items: center; transition: all 0.3s; flex-shrink: 0; }
+        .search-bar:focus-within { border-color: var(--accent-purple); box-shadow: 0 0 20px rgba(139, 92, 246, 0.2); }
+        .search-bar input { flex: 1; background: transparent; border: none; color: white; font-size: 1.1rem; outline: none; margin-left: 12px; }
+        
+        .news-grid { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; transition: opacity 0.3s; }
+        .news-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s; }
+        .news-content { padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+        .news-title { font-size: 1.2rem; color: var(--text-main); font-weight: bold; line-height: 1.3; }
+        .news-snippet { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+        .results-grid { display: none; grid-template-columns: 1.5fr 1fr; gap: 20px; animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; font-size: 0.9rem; line-height: 1.6; color: #d1d5db; }
+        .card h3 { color: white; margin-top: 0; margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;}
+        .spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent-purple); border-radius: 50%; animation: spin-loader 1s linear infinite; margin: 0 auto; }
+        @keyframes spin-loader { to { transform: rotate(360deg); } }
+        
+        .media-source-card { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px; display: flex; gap: 14px; align-items: center; transition: all 0.2s; cursor: pointer; }
+        .media-source-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); transform: translateX(2px); }
+
+        .chat-col { width: 380px; flex-shrink: 0; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; flex-direction: column; overflow: visible; transition: all 0.5s var(--apple-ease); transform-origin: right center; position: relative; }
+        .chat-col.hidden { width: 0; opacity: 0; margin-left: -24px; transform: scaleX(0.9); pointer-events: none; border: none; }
+        .chat-header { padding: 16px 20px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 0.95rem; }
+        
+        .chat-menu-container { position: relative; }
+        .dropdown-menu { position: absolute; top: 40px; right: 0; background: rgba(20, 22, 35, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 12px; width: 180px; padding: 8px; display: flex; flex-direction: column; gap: 4px; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: all 0.2s var(--apple-ease); z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .dropdown-menu.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .dropdown-menu button { background: transparent; border: none; color: var(--text-main); font-size: 0.85rem; padding: 10px 12px; text-align: left; border-radius: 8px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
+        .dropdown-menu button:hover { background: rgba(255,255,255,0.05); }
+        .dropdown-menu button.danger:hover { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
+        .msg { display: flex; gap: 12px; font-size: 0.85rem; line-height: 1.5; }
+        .msg-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; overflow: hidden; }
+        .msg.user .msg-avatar { background: rgba(139, 92, 246, 0.2); border: 1px solid var(--accent-purple); color: white; }
+        .msg.bot .msg-avatar { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); }
+        .msg-content { background: rgba(255,255,255,0.03); padding: 14px 18px; border-radius: 0 16px 16px 16px; border: 1px solid var(--glass-border); width: 100%; color: #d1d5db;}
+        .msg.user .msg-content { border-radius: 16px 0 16px 16px; background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.2); color: white; }
+        
+        .chat-input-area { padding: 16px; background: rgba(0,0,0,0.4); border-top: 1px solid var(--glass-border); display: flex; gap: 12px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+        .chat-input-area input { flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 12px 16px; border-radius: 12px; color: white; outline: none; transition: border 0.2s;}
+        .chat-input-area input:focus { border-color: var(--accent-purple); }
+        .chat-input-area button { background: var(--accent-purple); border: none; width: 44px; height: 44px; border-radius: 12px; color: white; cursor: pointer; transition: background 0.2s;}
+        .chat-input-area button:hover { background: #7c3aed; }
+
+        .card ul, .msg-content ul { margin-left: 20px; margin-bottom: 10px;}
+        .card p, .msg-content p { margin-bottom: 10px; }
+        .card pre, .msg-content pre { background: rgba(0,0,0,0.5); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 10px 0; border: 1px solid rgba(255,255,255,0.1); }
+        .card code, .msg-content code { font-family: monospace; color: #a78bfa; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="main-col">
+            <div class="top-status">
+                <div class="status-left">
+                    <!-- NÚCLEO CUÁNTICO EVOLUCIONADO -->
+                    <div class="quantum-core-container" id="quantumCore"><div class="quantum-core"></div></div>
+                    <div class="status-text">
+                        <strong>🛰️ Sistema en línea.</strong><br>
+                        <span id="weather-display" style="color: var(--text-muted);">Cargando base de conocimientos local...</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <!-- PANEL DE CARRAUSEL DINÁMICO DE CONSEJOS/ESTADÍSTICAS -->
+                    <span class="tip-text" id="tip-display">Iniciando módulos RAG...</span>
+                    <button class="icon-btn" id="toggleChatBtn" title="Ocultar/Mostrar Chat">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="logo-wrapper" id="logo-container">
+                <div class="logo-content">
+                    <img src="New_Logo_starmind.png" alt="StarMind Logo">
+                </div>
+            </div>
+
+            <div class="search-bar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-purple);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="mainSearchInput" placeholder="Busca análisis conceptuales profundos en tus PDFs indexados...">
+            </div>
+
+            <div class="news-grid" id="newsGrid"></div>
+
+            <div class="results-grid" id="resultsGrid">
+                <div class="card" id="answerCard">
+                    <h3>Análisis de StarMind</h3>
+                    <div style="padding:20px; text-align:center;"><div class="spinner"></div></div>
+                </div>
+                <div class="card" id="sourcesCard">
+                    <h3>Conocimientos y Fuentes Indexadas</h3>
+                    <div style="padding:20px; text-align:center;"><div class="spinner"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-col" id="chatSidebar">
+            <div class="chat-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-purple);"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                    Chat Inteligente
+                </div>
+                <div class="chat-menu-container">
+                    <button class="icon-btn" id="menuToggleBtn" style="width: 28px; height: 28px; border: none; background: transparent;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                    </button>
+                    <div class="dropdown-menu" id="chatDropdown">
+                        <button onclick="clearChat()" class="danger">🗑️ Limpiar Historial</button>
+                        <button onclick="exportChat()">💾 Exportar Chat</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatContainer">
+                <div class="msg bot">
+                    <div class="msg-avatar">
+                        <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; padding: 2px;"><polygon points="50,15 25,60 50,85" fill="#e85d04" opacity="0.9"/><polygon points="50,15 75,60 50,85" fill="#2a9d8f" opacity="0.9"/><polygon points="50,15 40,60 50,85" fill="#a8dadc" opacity="0.7"/><polygon points="50,15 60,60 50,85" fill="#457b9d" opacity="0.7"/></svg>
+                    </div>
+                    <div class="msg-content">
+                        ¡Hola! El módulo conversacional de StarMind RAG está activo y conectado a tu repositorio local de documentos. ¿Qué te gustaría consultar hoy?
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Haz una consulta rápida...">
+                <button id="chatSendBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8001/api';
+        marked.setOptions({ breaks: true, gfm: true });
+
+        const BOT_SVG_AVATAR = `<svg viewBox="0 0 100 100" style="width: 100%; height: 100%; padding: 2px;"><polygon points="50,15 25,60 50,85" fill="#e85d04" opacity="0.9"/><polygon points="50,15 75,60 50,85" fill="#2a9d8f" opacity="0.9"/><polygon points="50,15 40,60 50,85" fill="#a8dadc" opacity="0.7"/><polygon points="50,15 60,60 50,85" fill="#457b9d" opacity="0.7"/></svg>`;
+        
+        // Almacén de consejos para el carrusel de texto dinámico
+        let systemTips = [
+            "StarMind extrae conocimientos directamente de tus documentos locales.",
+            "Latencia de Ollama: Óptima | Núcleo de inferencia neural en línea.",
+            "Tip: Usa deepseek-r1 si requieres razonamientos lógicos avanzados paso a paso.",
+            "Seguridad máxima: Tus documentos nunca se envían a servidores externos.",
+            "Tip: Mantén tus PDFs limpios de escaneos borrosos para una mejor vectorización."
+        ];
+        let currentTipIndex = 0;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            renderNewsGrid();
+            try {
+                const res = await fetch(`${API_BASE_URL}/system-status`);
+                const data = await res.json();
+                document.getElementById('weather-display').innerText = data.weather;
+                
+                // Si el backend entrega un tip base, lo agregamos al carrusel
+                if (data.tip) {
+                    systemTips[0] = data.tip.replace('💡 ', '');
+                }
+                document.getElementById('tip-display').innerHTML = `💡 ${systemTips[0]}`;
+                
+                // Inicializar el bucle infinito del carrusel de texto dinámico (cada 8 segundos)
+                setInterval(rotateSystemTips, 8000);
+
+            } catch (e) {
+                console.error("No se pudo conectar al backend. Asegúrate de ejecutar el archivo python.");
+                document.getElementById('weather-display').innerText = "Desconectado del servidor local";
+                document.getElementById('tip-display').innerText = "⚠️ Ejecuta python app.py primero";
+                document.getElementById('quantumCore').style.display = "none"; // Ocultar núcleo si está apagado
+            }
+        });
+
+        // Función del Carrusel dinámico con desvanecimiento elegante
+        function rotateSystemTips() {
+            const tipElement = document.getElementById('tip-display');
+            if(!tipElement || tipElement.innerText.includes("⚠️")) return;
+
+            tipElement.classList.add('fade-out');
+            
+            setTimeout(() => {
+                currentTipIndex = (currentTipIndex + 1) % systemTips.length;
+                tipElement.innerHTML = `💡 ${systemTips[currentTipIndex]}`;
+                tipElement.classList.remove('fade-out');
+            }, 400); // Sincronizado con la duración de la transición CSS
+        }
+
+        function renderNewsGrid() {
+            const newsGrid = document.getElementById('newsGrid');
+            newsGrid.innerHTML = `
+                <div class="news-card" style="cursor: default; background: rgba(139, 92, 246, 0.05); border-color: rgba(139, 92, 246, 0.15);">
+                    <div class="news-content">
+                        <div class="news-title" style="color: var(--accent-purple); font-size: 1.2rem; margin-bottom: 4px;">📂 Repositorio de Conocimiento Local Activo</div>
+                        <div class="news-snippet">
+                            Para alimentar al sistema, simplemente guarda tus archivos <strong>.pdf</strong> dentro de la carpeta <code>documentos/</code> en la raíz del proyecto. 
+                            Cualquier búsqueda que realices en el panel superior escaneará tus textos de forma asíncrona, recuperará las referencias exactas de las páginas implicadas y generará un análisis unificado sin enviar tus datos a la red.
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const toggleChatBtn = document.getElementById('toggleChatBtn');
+        const chatSidebar = document.getElementById('chatSidebar');
+        toggleChatBtn.addEventListener('click', () => { chatSidebar.classList.toggle('hidden'); });
+
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        const chatDropdown = document.getElementById('chatDropdown');
+        menuToggleBtn.addEventListener('click', (e) => { e.stopPropagation(); chatDropdown.classList.toggle('active'); });
+        document.addEventListener('click', () => { chatDropdown.classList.remove('active'); });
+        chatDropdown.addEventListener('click', (e) => { e.stopPropagation(); });
+
+        window.clearChat = function() {
+            document.getElementById('chatContainer').innerHTML = `
+                <div class="msg bot"><div class="msg-avatar">${BOT_SVG_AVATAR}</div><div class="msg-content">Historial de memoria conversacional borrado.</div></div>
+            `;
+            chatHistory = [];
+            chatDropdown.classList.remove('active');
+        };
+
+        window.exportChat = function() {
+            let exportText = "--- Exportación de StarMind RAG Chat ---\n\n";
+            document.querySelectorAll('.msg').forEach(msg => {
+                const sender = msg.classList.contains('user') ? "Usuario" : "StarMind";
+                const content = msg.querySelector('.msg-content').innerText;
+                exportText += `${sender}: ${content}\n\n`;
+            });
+            const blob = new Blob([exportText], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url; a.download = "StarMind_RAG_Chat_Log.txt"; a.click();
+            URL.revokeObjectURL(url);
+            chatDropdown.classList.remove('active');
+        };
+
+        const searchInput = document.getElementById('mainSearchInput');
+        const logoContainer = document.getElementById('logo-container');
+        const quantumCore = document.getElementById('quantumCore');
+        const answerCard = document.getElementById('answerCard');
+        const sourcesCard = document.getElementById('sourcesCard');
+        const newsGrid = document.getElementById('newsGrid');
+        const resultsGrid = document.getElementById('resultsGrid');
+
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            newsGrid.style.display = 'none';
+            resultsGrid.style.display = 'grid';
+            logoContainer.classList.add('is-searching');
+            if(quantumCore) quantumCore.classList.add('processing'); // Activar pulso hiperactivo de procesamiento
+            
+            answerCard.innerHTML = `<h3>Análisis de StarMind</h3><div style="padding:20px; text-align:center;"><div class="spinner"></div></div>`;
+            sourcesCard.innerHTML = `<h3>Conocimientos y Fuentes Indexadas</h3><div style="padding:20px; text-align:center;"><div class="spinner"></div></div>`;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                const data = await res.json();
+                
+                answerCard.innerHTML = `<h3>Análisis de StarMind</h3>${marked.parse(data.answer)}`;
+                
+                if(data.sources && data.sources.length > 0) {
+                    let sourcesHTML = `<h3>Conocimientos y Fuentes Indexadas</h3>`;
+                    sourcesHTML += `<div class="sources-list" style="display: flex; flex-direction: column; gap: 14px; max-height: 550px; overflow-y: auto; padding-right:4px;">`;
+                    
+                    data.sources.forEach(source => {
+                        let badgeColor = '#e85d04';
+
+                        sourcesHTML += `
+                            <div class="media-source-card" title="${source.hint}">
+                                <div class="source-thumb" style="width: 50px; height: 50px; border-radius: 8px; background-image: url('${source.thumbnail}'); background-size: cover; background-position: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.05); position: relative;">
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                        <span style="background: ${badgeColor}; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase;">RAG DOC</span>
+                                        <span style="font-size: 0.65rem; color: var(--text-muted);">Relevancia: ${source.priority}%</span>
+                                    </div>
+                                    <div style="color: #fff; font-size: 0.85rem; font-weight: bold; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        ${source.title}
+                                    </div>
+                                    <p style="color: var(--text-muted); font-size: 0.75rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px;">
+                                        ${source.snippet}
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    sourcesHTML += `</div>`;
+                    sourcesCard.innerHTML = sourcesHTML;
+                } else {
+                    sourcesCard.innerHTML = `<h3>Conocimientos y Fuentes</h3><p style="color:var(--text-muted);">No se encontraron fragmentos asociados al contexto.</p>`;
+                }
+            } catch (e) {
+                answerCard.innerHTML = `<h3 style="color:#ef4444;">Error de Conexión</h3><p>Verifica la ejecución del Backend de StarMind (app.py).</p>`;
+                sourcesCard.innerHTML = `<h3>Conocimientos y Fuentes</h3><p>-</p>`;
+            } finally {
+                logoContainer.classList.remove('is-searching');
+                if(quantumCore) quantumCore.classList.remove('processing'); // Retornar núcleo al pulso base calmado
+            }
+        }
+        searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') performSearch(); });
+
+        let chatHistory = [];
+        const chatInput = document.getElementById('chatInput');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+        const chatContainer = document.getElementById('chatContainer');
+
+        function appendMsg(sender, text) {
+            const isUser = sender === 'user';
+            const avatar = isUser ? 'U' : BOT_SVG_AVATAR;
+            const cls = isUser ? 'user' : 'bot';
+            const content = isUser ? text : marked.parse(text);
+            
+            chatContainer.insertAdjacentHTML('beforeend', `
+                <div class="msg ${cls}">
+                    <div class="msg-avatar">${avatar}</div>
+                    <div class="msg-content">${content}</div>
+                </div>
+            `);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendChat() {
+            const msg = chatInput.value.trim();
+            if(!msg) return;
+            
+            appendMsg('user', msg);
+            chatHistory.push({role: 'user', content: msg});
+            chatInput.value = '';
+
+            const typingId = 'typing-' + Date.now();
+            chatContainer.insertAdjacentHTML('beforeend', `<div class="msg bot" id="${typingId}"><div class="msg-avatar">${BOT_SVG_AVATAR}</div><div class="msg-content" style="display:flex;align-items:center;"><div class="spinner" style="width:16px;height:16px;border-width:2px;margin:0;"></div></div></div>`);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, history: chatHistory.slice(-6) })
+                });
+                document.getElementById(typingId).remove();
+                const data = await res.json();
+                chatHistory.push({role: 'assistant', content: data.reply});
+                appendMsg('bot', data.reply);
+            } catch (e) {
+                if(document.getElementById(typingId)) document.getElementById(typingId).remove();
+                appendMsg('bot', '<span style="color:#ef4444;">Error de conexión con el backend local.</span>');
+            }
+        }
+
+        chatSendBtn.addEventListener('click', sendChat);
+        chatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendChat(); });
+    </script>
+</body>
+</html>
